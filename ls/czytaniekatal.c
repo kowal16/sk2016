@@ -4,10 +4,10 @@
 #include <errno.h>
 #include <string.h>
 #include <sys/stat.h>
-#include<pwd.h>
-#include<grp.h>
-#include<stdio.h>
-#include<time.h>
+#include <pwd.h>
+#include <grp.h>
+#include <stdio.h>
+#include <time.h>
 
 /* odpowiednik perror() - wypisuje komunikat o bledzie na stderr */
 void wypisz_blad(char *msg){
@@ -27,6 +27,7 @@ void wypisz_tekst(const char *msg){
         wypisz_blad("Problem z pisaniem na stdout");
     }
 }
+/*funkcja do zamiany czasu modyfikacji na string*/
 char buffer[200];
 char *formatdate(char *buff, time_t val){
 	strftime(buff,200, "%d.%m.%Y %H:%M:%S",localtime(&val));
@@ -37,7 +38,7 @@ void direntInfo(char *name){
 	struct stat plik;
 	struct passwd *pw;
 	struct group *gr;
-/*typ pliku */
+	/*typ pliku */
 	if (lstat(name, &plik)==0){
 	if(S_ISDIR(plik.st_mode)) wypisz_tekst("d");
 	else
@@ -53,13 +54,12 @@ void direntInfo(char *name){
         if(plik.st_mode & S_IWGRP) wypisz_tekst("w"); else wypisz_tekst("-");
         if(plik.st_mode & S_IXGRP) wypisz_tekst("x"); else wypisz_tekst("-");
         if(plik.st_mode & S_IROTH) wypisz_tekst("r"); else wypisz_tekst("-");
-        if(plik.st_mode & S_IWOTH) wypisz_tekst("w"); else wypisz_tekst("-");     
-	if(plik.st_mode & S_IXOTH) wypisz_tekst("x "); else wypisz_tekst("- ");
+        if(plik.st_mode & S_IWOTH) wypisz_tekst("w"); else wypisz_tekst("-");     	if(plik.st_mode & S_IXOTH) wypisz_tekst("x "); else wypisz_tekst("- ");
 	/*nazwa wlasciciela, nazwa grupy uzytkownika, rozmiar, nazwa pliku */ 
 	pw = getpwuid(plik.st_uid);
 	gr = getgrgid(plik.st_gid);
-	printf("  %s %s %db \t%s",pw->pw_name,gr->gr_name,(int)plik.st_size,formatdate(buffer,plik.st_mtime));
-	printf("\t%s\n",name);
+	printf("  %s %s %db \t%s\t%s\n",pw->pw_name,gr->gr_name,(int)plik.st_size,formatdate(buffer,plik.st_mtime),name);
+	
 	}
 }
 int main(int argc, char *argv[])
