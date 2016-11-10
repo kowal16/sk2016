@@ -5,6 +5,9 @@
 #include <string.h>
 #include <sys/stat.h>
 #include<pwd.h>
+#include<grp.h>
+#include<stdio.h>
+#include<time.h>
 
 /* odpowiednik perror() - wypisuje komunikat o bledzie na stderr */
 void wypisz_blad(char *msg){
@@ -24,11 +27,16 @@ void wypisz_tekst(const char *msg){
         wypisz_blad("Problem z pisaniem na stdout");
     }
 }
-
+char buffer[200];
+char *formatdate(char *buff, time_t val){
+	strftime(buff,200, "%d.%m.%Y %H:%M:%S",localtime(&val));
+	return buff;
+}
 
 void direntInfo(char *name){
 	struct stat plik;
-	struct passwd tak;	
+	struct passwd *pw;
+	struct group *gr;
 /*typ pliku */
 	if (lstat(name, &plik)==0){
 	if(S_ISDIR(plik.st_mode)) wypisz_tekst("d");
@@ -47,11 +55,11 @@ void direntInfo(char *name){
         if(plik.st_mode & S_IROTH) wypisz_tekst("r"); else wypisz_tekst("-");
         if(plik.st_mode & S_IWOTH) wypisz_tekst("w"); else wypisz_tekst("-");     
 	if(plik.st_mode & S_IXOTH) wypisz_tekst("x "); else wypisz_tekst("- ");
-	
-/*	uid_t getuid(void);
-	wypisz_tekst(tak.pw_uid);
-*/
-	wypisz_tekst(name);
+	/*nazwa wlasciciela, nazwa grupy uzytkownika, rozmiar, nazwa pliku */ 
+	pw = getpwuid(plik.st_uid);
+	gr = getgrgid(plik.st_gid);
+	printf("  %s %s %db \t%s",pw->pw_name,gr->gr_name,(int)plik.st_size,formatdate(buffer,plik.st_mtime));
+	printf("\t%s\n",name);
 	}
 }
 int main(int argc, char *argv[])
@@ -69,7 +77,7 @@ int main(int argc, char *argv[])
 
     while ((wpis = readdir(katalog)) != NULL){
         direntInfo(wpis->d_name);
-        wypisz_tekst("\n");
+       
     }
 	
     if (errno != 0){  /* jesli readdir() napotkal blad - zmieni errno */
