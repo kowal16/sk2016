@@ -10,6 +10,7 @@ int main(){
     int sockfd; 
     char buffer[8192];                      /* deskryptor gniazda */
     struct sockaddr_in server_addr;   /* adres serwera */
+    
 
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;                /* IPv4 */

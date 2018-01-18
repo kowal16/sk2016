@@ -49,12 +49,13 @@ int main(int argc, char **argv){
     
     opis_operacji[1].sem_num = 1;
     opis_operacji[1].sem_flg = SEM_UNDO;
-    opis_operacji[1].sem_op = 0;    /* w ktorym _nie_ma_ wiadomosci */
+    opis_operacji[1].sem_op = -1;    /* w ktorym ma_ wiadomosci */
     
     /* wykonuje operacje na dwoch semaforach */
     semop(sem_id, opis_operacji, 2);
     
     /* wpisuje wiadomosc */
+    printf("[%s] %s\n", msg->uzytkownik, msg->tresc);
     strncpy(msg->uzytkownik, argv[1], 32);
     strncpy(msg->tresc, argv[2], 256);
     
